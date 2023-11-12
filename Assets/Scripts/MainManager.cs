@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class MainManager : MonoBehaviour
 {
@@ -11,21 +12,24 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text highScoreName;
+    public Text highScoreText;
+    public Text Name;
     public GameObject GameOverText;
-    
+
+    private int currentScore;
     private bool m_Started = false;
-    private int m_Points;
-    
     private bool m_GameOver = false;
 
-    
+
     // Start is called before the first frame update
     void Start()
     {
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
-        
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
+
+
+        int[] pointCountArray = new[] { 1, 1, 2, 2, 5, 5 };
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -36,6 +40,8 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        Name.text = PlayerPrefs.GetString("SavedName");
+        HighScoreUpdate();
     }
 
     private void Update()
@@ -64,13 +70,33 @@ public class MainManager : MonoBehaviour
 
     void AddPoint(int point)
     {
-        m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        currentScore += point;
+        ScoreText.text = $"Score : {currentScore}";
     }
-
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        HighScoreUpdate();
+    }
+    public void HighScoreUpdate()
+    {
+        if (PlayerPrefs.HasKey("SavedHighScore"))
+        {
+            if (currentScore > PlayerPrefs.GetInt("SavedHighScore"))
+            {
+                PlayerPrefs.SetInt("SavedHighScore", currentScore);
+                PlayerPrefs.SetString("SavedHighScoreName", Name.text);
+            }
+        }
+        else
+        {
+            PlayerPrefs.SetInt("SavedHighScore", currentScore);
+            PlayerPrefs.SetString("SavedHighScoreName", Name.text);
+        }
+        highScoreText.text = $"Best Score: {PlayerPrefs.GetInt("SavedHighScore").ToString()} ";
+        highScoreName.text = PlayerPrefs.GetString("SavedHighScoreName");
+
     }
 }
+
