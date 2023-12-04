@@ -10,7 +10,7 @@ public class MainManager : MonoBehaviour
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
-
+    public Rigidbody powerUpBallRb;
     public Text ScoreText;
     public Text highScoreName;
     public Text highScoreText;
@@ -22,13 +22,12 @@ public class MainManager : MonoBehaviour
     private bool m_GameOver = false;
 
 
+
     // Start is called before the first frame update
     void Start()
     {
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
-
-
         int[] pointCountArray = new[] { 1, 1, 2, 2, 5, 5 };
         for (int i = 0; i < LineCount; ++i)
         {
@@ -57,6 +56,7 @@ public class MainManager : MonoBehaviour
 
                 Ball.transform.SetParent(null);
                 Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange);
+
             }
         }
         else if (m_GameOver)
@@ -66,8 +66,9 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+        else if (Input.GetKeyDown(KeyCode.Q)) { SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
     }
-
+    
     void AddPoint(int point)
     {
         currentScore += point;
@@ -75,7 +76,7 @@ public class MainManager : MonoBehaviour
     }
     public void GameOver()
     {
-        m_GameOver = true;
+        m_GameOver = true;       
         GameOverText.SetActive(true);
         HighScoreUpdate();
     }
@@ -94,7 +95,7 @@ public class MainManager : MonoBehaviour
             PlayerPrefs.SetInt("SavedHighScore", currentScore);
             PlayerPrefs.SetString("SavedHighScoreName", Name.text);
         }
-        highScoreText.text = $"Best Score: {PlayerPrefs.GetInt("SavedHighScore").ToString()} ";
+        highScoreText.text = PlayerPrefs.GetInt("SavedHighScore").ToString();
         highScoreName.text = PlayerPrefs.GetString("SavedHighScoreName");
 
     }
